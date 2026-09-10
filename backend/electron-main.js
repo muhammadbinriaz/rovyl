@@ -2588,6 +2588,20 @@ function configureAutoUpdates() {
     return;
   }
 
+  /**
+   * Fork/build personalizado: não puxar releases do repositório oficial por cima deste build. O
+   * updater aponta para as releases upstream; ao encontrar uma versão mais recente, o
+   * `autoInstallOnAppQuit` reinstalava-a à saída — apagando as correções locais e, como o hook
+   * PowerShell prende ficheiros da instalação, entrando no ciclo de atualização falhada descrito
+   * mais acima. Desligado por omissão; `ROVYL_ENABLE_UPDATER=1` restaura o comportamento original.
+   */
+  if (process.env.ROVYL_ENABLE_UPDATER !== "1") {
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
+    diagLog("[Update] Fork build — updater desativado (ROVYL_ENABLE_UPDATER=1 para reativar)");
+    return;
+  }
+
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
